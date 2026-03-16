@@ -1,0 +1,44 @@
+# ── Java / Maven ─────────────────────────────────────────────
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/**/*.class
+*.jar
+*.war
+
+# ── Node / NPM ──────────────────────────────────────────────
+frontend/node_modules/
+e2e/node_modules/
+frontend/dist/
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# ── Environment ─────────────────────────────────────────────
+.env
+*.env.local
+.env.*
+
+# ── IDE ─────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ── OS ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Test / Coverage Reports ─────────────────────────────────
+frontend/coverage/
+e2e/playwright-report/
+e2e/test-results/
+backend/target/site/
+
+# ── Docker ──────────────────────────────────────────────────
+docker-compose.override.yml
