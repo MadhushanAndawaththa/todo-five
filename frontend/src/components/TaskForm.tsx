@@ -42,7 +42,7 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
           value={title}
           onChange={e => setTitle(e.target.value)}
           placeholder="What needs to be done?"
-          maxLength={255}
+          maxLength={60}
           className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-gray-700 px-4 py-3 text-sm text-slate-900 dark:text-gray-100 placeholder-slate-400 dark:placeholder-slate-500
                      transition-shadow duration-200
                      focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
@@ -50,6 +50,9 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
           disabled={isSubmitting}
           data-testid="title-input"
         />
+        <span className={`block mt-1 text-xs text-right ${title.length >= 55 ? 'text-amber-500 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
+          {title.length}/60
+        </span>
       </div>
 
       <div>
