@@ -1,0 +1,66 @@
+services:
+
+  # ── PostgreSQL Database ─────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: todo_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-todoapp}
+      POSTGRES_USER: ${DB_USER:-todoapp}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-todoapp}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - todo_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-todoapp} -d ${DB_NAME:-todoapp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot Backend ─────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: todo_backend
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-todoapp}
+      DB_USER: ${DB_USER:-todoapp}
+      DB_PASSWORD: ${DB_PASSWORD:-todoapp}
+    ports:
+      - "8080:8080"
+    networks:
+      - todo_network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── React Frontend (Nginx) ───────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: todo_frontend
+    ports:
+      - "3000:80"
+    networks:
+      - todo_network
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  todo_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
