@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { TaskCard } from './TaskCard'
@@ -33,7 +33,9 @@ describe('TaskCard', () => {
 
     await userEvent.click(screen.getByTestId('done-button'))
 
-    expect(onComplete).toHaveBeenCalledWith(1)
+    await waitFor(() => {
+      expect(onComplete).toHaveBeenCalledWith(1)
+    })
   })
 
   it('has accessible aria-label on Done button', () => {
