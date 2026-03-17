@@ -41,11 +41,24 @@ done
 echo ""
 echo "▸ E2E Tests  (Playwright · Chromium)"
 echo "--------------------------------------------------------------"
+
+# On Linux (--network host): browser reaches localhost:3000 directly — same
+# origin as the app, no CORS preflight involved.
+# On macOS/Windows Docker Desktop (host.docker.internal): CORS config allows
+# http://host.docker.internal:3000 explicitly in CorsConfig.java.
+if [ "$(uname)" = "Linux" ]; then
+  NETWORK_ARGS="--network host"
+  BASE_URL="http://localhost:3000"
+else
+  NETWORK_ARGS="--add-host=host.docker.internal:host-gateway"
+  BASE_URL="http://host.docker.internal:3000"
+fi
+
 docker run --rm \
-  --add-host=host.docker.internal:host-gateway \
+  $NETWORK_ARGS \
   -v "$(pwd)/e2e:/app" \
   -w /app \
-  -e PLAYWRIGHT_BASE_URL=http://host.docker.internal:3000 \
+  -e PLAYWRIGHT_BASE_URL="$BASE_URL" \
   node:20-bookworm \
   sh -c "npm install --silent && npx playwright install chromium --with-deps && npx playwright test"
 
