@@ -79,6 +79,33 @@ class TaskControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /api/tasks - should return 400 when title is whitespace only")
+    void createTask_shouldReturn400WhenTitleWhitespace() throws Exception {
+        CreateTaskRequest request = new CreateTaskRequest("   ", "Some description");
+
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("Validation failed"))
+            .andExpect(jsonPath("$.fields.title").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/tasks - should return 400 when title exceeds 255 characters")
+    void createTask_shouldReturn400WhenTitleTooLong() throws Exception {
+        String longTitle = "a".repeat(256);
+        CreateTaskRequest request = new CreateTaskRequest(longTitle, "Some description");
+
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("Validation failed"))
+            .andExpect(jsonPath("$.fields.title").exists());
+    }
+
+    @Test
     @DisplayName("GET /api/tasks - should return only incomplete tasks, max 5")
     void getTasks_shouldReturnOnlyIncomplete_max5() throws Exception {
         // Create 7 tasks

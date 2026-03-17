@@ -25,6 +25,13 @@ describe('TaskForm', () => {
     expect(screen.getByTestId('submit-button')).toBeDisabled()
   })
 
+  it('disables submit button when only description is filled', async () => {
+    render(<TaskForm onSubmit={vi.fn()} />)
+    await userEvent.type(screen.getByTestId('description-input'), 'Some description')
+
+    expect(screen.getByTestId('submit-button')).toBeDisabled()
+  })
+
   it('enables submit button when both fields have content', async () => {
     render(<TaskForm onSubmit={vi.fn()} />)
     await userEvent.type(screen.getByTestId('title-input'), 'Buy milk')

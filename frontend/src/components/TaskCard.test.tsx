@@ -43,4 +43,22 @@ describe('TaskCard', () => {
 
     expect(screen.getByRole('button', { name: /mark "buy groceries" as done/i })).toBeInTheDocument()
   })
+
+  it('disables Done button while completing', async () => {
+    const onComplete = vi.fn().mockImplementation(() => new Promise(() => {}))
+    render(<TaskCard task={mockTask} onComplete={onComplete} />)
+
+    await userEvent.click(screen.getByTestId('done-button'))
+
+    expect(screen.getByTestId('done-button')).toBeDisabled()
+  })
+
+  it('shows checkmark text while completing', async () => {
+    const onComplete = vi.fn().mockImplementation(() => new Promise(() => {}))
+    render(<TaskCard task={mockTask} onComplete={onComplete} />)
+
+    await userEvent.click(screen.getByTestId('done-button'))
+
+    expect(screen.getByTestId('done-button')).toHaveTextContent('✓')
+  })
 })

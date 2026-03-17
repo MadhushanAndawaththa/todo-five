@@ -91,6 +91,18 @@ class TaskServiceTest {
     }
 
     @Test
+    @DisplayName("completeTask - should return response with completed true")
+    void completeTask_shouldReturnCompletedResponse() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(mockTask));
+        when(taskRepository.save(mockTask)).thenReturn(mockTask);
+
+        TaskResponse response = taskService.completeTask(1L);
+
+        assertThat(response.completed()).isTrue();
+        assertThat(response.title()).isEqualTo("Buy groceries");
+    }
+
+    @Test
     @DisplayName("completeTask - should throw TaskNotFoundException for non-existent id")
     void completeTask_shouldThrowForUnknownId() {
         when(taskRepository.findById(999L)).thenReturn(Optional.empty());

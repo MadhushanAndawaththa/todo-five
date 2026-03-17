@@ -34,6 +34,11 @@ test.describe('Todo App E2E', () => {
     await expect(page.getByTestId('submit-button')).toBeDisabled()
   })
 
+  test('submit button is disabled when only description is filled', async ({ page }) => {
+    await page.getByTestId('description-input').fill('Some description')
+    await expect(page.getByTestId('submit-button')).toBeDisabled()
+  })
+
   test('marking a task as done removes it from the list', async ({ page }) => {
     await page.getByTestId('title-input').fill('Task to complete')
     await page.getByTestId('description-input').fill('This should disappear')
