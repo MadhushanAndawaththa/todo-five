@@ -175,9 +175,9 @@ flowchart LR
 ```
 
 **GET `/api/tasks/count`**
-```
-// Response 200 (plain number)
-7
+```json
+// Response 200
+{ "count": 7 }
 ```
 
 **Validation errors — 400 Bad Request**

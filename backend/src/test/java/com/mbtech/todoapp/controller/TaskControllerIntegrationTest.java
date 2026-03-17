@@ -167,7 +167,7 @@ class TaskControllerIntegrationTest {
 
         mockMvc.perform(get("/api/tasks/count"))
             .andExpect(status().isOk())
-            .andExpect(content().string("3"));
+            .andExpect(jsonPath("$.count").value(3));
     }
 
     @Test
@@ -184,7 +184,7 @@ class TaskControllerIntegrationTest {
 
         mockMvc.perform(get("/api/tasks/count"))
             .andExpect(status().isOk())
-            .andExpect(content().string("1"));
+            .andExpect(jsonPath("$.count").value(1));
     }
 
     @Test
@@ -192,7 +192,7 @@ class TaskControllerIntegrationTest {
     void getTaskCount_shouldReturnZeroWhenEmpty() throws Exception {
         mockMvc.perform(get("/api/tasks/count"))
             .andExpect(status().isOk())
-            .andExpect(content().string("0"));
+            .andExpect(jsonPath("$.count").value(0));
     }
 
     private void createTask(String title, String description) throws Exception {
