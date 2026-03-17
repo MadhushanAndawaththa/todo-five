@@ -42,10 +42,10 @@ echo ""
 echo "▸ E2E Tests  (Playwright · Chromium)"
 echo "--------------------------------------------------------------"
 docker run --rm \
-  --network todo-app_todo_network \
+  --add-host=host.docker.internal:host-gateway \
   -v "$(pwd)/e2e:/app" \
   -w /app \
-  -e PLAYWRIGHT_BASE_URL=http://todo_frontend:80 \
+  -e PLAYWRIGHT_BASE_URL=http://host.docker.internal:3000 \
   node:20-bookworm \
   sh -c "npm install --silent && npx playwright install chromium --with-deps && npx playwright test"
 
