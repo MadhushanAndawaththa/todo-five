@@ -221,6 +221,8 @@ flowchart LR
 │   └── Dockerfile            # Multi-stage: Node → Nginx Alpine
 │
 ├── e2e/                      # Playwright end-to-end tests
+├── test.sh                   # Run all unit/integration tests (Docker only)
+├── e2e-test.sh               # Run E2E tests (Docker only)
 ├── docker-compose.yml        # Full stack orchestration
 └── README.md
 ```
@@ -229,41 +231,46 @@ flowchart LR
 
 ## Running Tests
 
-### Backend
+> **Requires only Docker** — no Maven, Java, or Node installation needed.
+
+### Unit + Integration tests
 
 ```bash
-cd backend
-./mvnw test
+./test.sh
 ```
 
+Runs **19 backend tests** (JUnit 5 + Spring Boot integration tests with H2 in-memory DB) and **14 frontend tests** (Vitest + React Testing Library) inside Docker containers.
+
+### End-to-end tests
+
+```bash
+./e2e-test.sh
+```
+
+Builds the full stack, waits until the app is ready, runs **7 Playwright scenarios** in headless Chromium, then automatically cleans up all containers.
+
+<details>
+<summary>Run tests manually (requires Maven / Node on your machine)</summary>
+
+**Backend**
+```bash
+cd backend && mvn test
+```
 Coverage report → `backend/target/site/jacoco/index.html` (enforced ≥80%)
 
-### Frontend
-
+**Frontend**
 ```bash
-cd frontend
-npm install && npm test
+cd frontend && npm install && npm test
 ```
 
-### End-to-end
-
-Ensure the full stack is running first, then run Playwright from the `e2e/` directory:
-
+**E2E**
 ```bash
-# Start all containers (wait until http://localhost:3000 is reachable)
 docker-compose up -d --build
-
-# Install dependencies and browser
-cd e2e
-npm install
+cd e2e && npm install
 npx playwright install chromium
-
-# Run tests
-npx playwright test
-
-# Open the HTML report after the run
-npx playwright show-report
+npx playwright test && npx playwright show-report
 ```
+</details>
 
 ---
 
