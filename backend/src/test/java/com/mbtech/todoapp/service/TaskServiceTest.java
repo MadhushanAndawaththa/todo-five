@@ -99,4 +99,25 @@ class TaskServiceTest {
             .isInstanceOf(TaskNotFoundException.class)
             .hasMessageContaining("999");
     }
+
+    @Test
+    @DisplayName("countIncompleteTasks - should return count from repository")
+    void countIncompleteTasks_shouldReturnCount() {
+        when(taskRepository.countByCompletedFalse()).thenReturn(7L);
+
+        long count = taskService.countIncompleteTasks();
+
+        assertThat(count).isEqualTo(7L);
+        verify(taskRepository, times(1)).countByCompletedFalse();
+    }
+
+    @Test
+    @DisplayName("countIncompleteTasks - should return zero when no incomplete tasks")
+    void countIncompleteTasks_shouldReturnZeroWhenEmpty() {
+        when(taskRepository.countByCompletedFalse()).thenReturn(0L);
+
+        long count = taskService.countIncompleteTasks();
+
+        assertThat(count).isEqualTo(0L);
+    }
 }

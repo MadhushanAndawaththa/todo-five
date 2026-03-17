@@ -158,6 +158,43 @@ class TaskControllerIntegrationTest {
             .andExpect(jsonPath("$", hasSize(0)));
     }
 
+    @Test
+    @DisplayName("GET /api/tasks/count - should return count of incomplete tasks")
+    void getTaskCount_shouldReturnIncompleteCount() throws Exception {
+        createTask("Task 1", "desc");
+        createTask("Task 2", "desc");
+        createTask("Task 3", "desc");
+
+        mockMvc.perform(get("/api/tasks/count"))
+            .andExpect(status().isOk())
+            .andExpect(content().string("3"));
+    }
+
+    @Test
+    @DisplayName("GET /api/tasks/count - should exclude completed tasks from count")
+    void getTaskCount_shouldExcludeCompletedTasks() throws Exception {
+        createTask("Task 1", "desc");
+        String response = mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CreateTaskRequest("Task 2", "desc"))))
+            .andReturn().getResponse().getContentAsString();
+
+        Long taskId = objectMapper.readTree(response).get("id").asLong();
+        mockMvc.perform(patch("/api/tasks/" + taskId + "/complete"));
+
+        mockMvc.perform(get("/api/tasks/count"))
+            .andExpect(status().isOk())
+            .andExpect(content().string("1"));
+    }
+
+    @Test
+    @DisplayName("GET /api/tasks/count - should return zero when no tasks")
+    void getTaskCount_shouldReturnZeroWhenEmpty() throws Exception {
+        mockMvc.perform(get("/api/tasks/count"))
+            .andExpect(status().isOk())
+            .andExpect(content().string("0"));
+    }
+
     private void createTask(String title, String description) throws Exception {
         mockMvc.perform(post("/api/tasks")
             .contentType(MediaType.APPLICATION_JSON)
