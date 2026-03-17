@@ -4,6 +4,7 @@
 # Starts the full stack, runs tests, then cleans up.
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
+export MSYS_NO_PATHCONV=1
 
 cleanup() {
   echo ""

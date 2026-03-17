@@ -4,6 +4,7 @@
 # No Maven, Java, or Node installation required.
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
+export MSYS_NO_PATHCONV=1
 
 echo ""
 echo "======================================================"
