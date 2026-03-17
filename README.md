@@ -41,10 +41,29 @@ docker-compose up --build
 
 Open **http://localhost:3000** — that's it.
 
+| Service | URL |
+|---------|-----|
+| **App** | http://localhost:3000 |
+| **Swagger UI** | http://localhost:8080/swagger-ui.html |
+| **API docs (JSON)** | http://localhost:8080/api-docs |
+| **Health check** | http://localhost:8080/actuator/health |
+
 <details>
 <summary>First build taking long?</summary>
 
 The initial build downloads Maven and npm dependencies inside Docker. Subsequent builds use cached layers and complete in seconds.
+</details>
+
+<details>
+<summary>Default credentials / environment variables</summary>
+
+The following defaults are used out of the box. Override them by creating a `.env` file in the project root:
+
+```env
+DB_NAME=todoapp
+DB_USER=todoapp
+DB_PASSWORD=todoapp
+```
 </details>
 
 ---
@@ -67,15 +86,23 @@ The initial build downloads Maven and npm dependencies inside Docker. Subsequent
 
 ## Architecture
 
-```
-┌──────────────────┐      ┌──────────────────────────┐      ┌──────────────┐
-│   React SPA      │─────▶│  Spring Boot REST API    │─────▶│  PostgreSQL  │
-│   Nginx · :3000  │      │  Java 21  · :8080        │      │  :5432       │
-└──────────────────┘      └──────────────────────────┘      └──────────────┘
+```mermaid
+flowchart LR
+    Browser(["🌐 Browser"])
+    FE["React SPA\nNginx · :3000"]
+    BE["Spring Boot REST API\nJava 21 · :8080"]
+    DB[("PostgreSQL 16\n:5432")]
+
+    Browser -->|HTTP| FE
+    FE -- "/api/ reverse proxy" --> BE
+    BE -->|JPA / Hibernate| DB
 ```
 
-```
-Controller  →  Service (interface)  →  Repository  →  Entity
+**Backend layer structure:**
+
+```mermaid
+flowchart LR
+    C["Controller"] --> S["Service\n(interface + impl)"] --> R["Repository"] --> E["Entity"]
 ```
 
 ### Tech Stack
@@ -119,6 +146,50 @@ Controller  →  Service (interface)  →  Repository  →  Entity
 | `GET` | `/api/tasks` | `200` | List 5 most recent incomplete tasks |
 | `PATCH` | `/api/tasks/{id}/complete` | `200` | Mark a task as completed |
 | `GET` | `/api/tasks/count` | `200` | Count all incomplete tasks |
+
+<details>
+<summary>Request &amp; response examples</summary>
+
+**POST `/api/tasks`**
+```json
+// Request
+{ "title": "Buy groceries", "description": "Milk, eggs, and bread" }
+
+// Response 201
+{ "id": 1, "title": "Buy groceries", "description": "Milk, eggs, and bread", "completed": false, "createdAt": "2026-03-17T10:00:00" }
+```
+
+**GET `/api/tasks`**
+```json
+// Response 200 — array of up to 5 incomplete tasks, newest first
+[
+  { "id": 2, "title": "Walk the dog", "description": "30 minute walk", "completed": false, "createdAt": "2026-03-17T10:05:00" },
+  { "id": 1, "title": "Buy groceries", "description": "Milk, eggs, and bread", "completed": false, "createdAt": "2026-03-17T10:00:00" }
+]
+```
+
+**PATCH `/api/tasks/{id}/complete`**
+```json
+// Response 200
+{ "id": 1, "title": "Buy groceries", "description": "Milk, eggs, and bread", "completed": true, "createdAt": "2026-03-17T10:00:00" }
+```
+
+**GET `/api/tasks/count`**
+```
+// Response 200 (plain number)
+7
+```
+
+**Validation errors — 400 Bad Request**
+```json
+{ "error": "Validation failed", "fields": { "title": "must not be blank" } }
+```
+
+**Not found — 404**
+```json
+{ "error": "Task not found with id: 999" }
+```
+</details>
 
 > **Interactive docs:** http://localhost:8080/swagger-ui.html
 
@@ -176,11 +247,22 @@ npm install && npm test
 
 ### End-to-end
 
+Ensure the full stack is running first, then run Playwright from the `e2e/` directory:
+
 ```bash
-docker-compose up -d
-cd e2e && npm install
+# Start all containers (wait until http://localhost:3000 is reachable)
+docker-compose up -d --build
+
+# Install dependencies and browser
+cd e2e
+npm install
 npx playwright install chromium
+
+# Run tests
 npx playwright test
+
+# Open the HTML report after the run
+npx playwright show-report
 ```
 
 ---
@@ -197,4 +279,4 @@ npx playwright test
 
 ## License
 
-[MIT](LICENSE) © 2025 Madhushan Andawaththa
+[MIT](LICENSE) © 2026 Madhushan Andawaththa
