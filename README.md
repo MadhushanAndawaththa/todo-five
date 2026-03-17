@@ -69,8 +69,8 @@ The initial build downloads Maven and npm dependencies inside Docker. Subsequent
 
 ```
 ┌──────────────────┐      ┌──────────────────────────┐      ┌──────────────┐
-│   React SPA      │─────▶│  Spring Boot REST API     │─────▶│  PostgreSQL  │
-│   Nginx · :3000  │      │  Java 21  · :8080         │      │  :5432       │
+│   React SPA      │─────▶│  Spring Boot REST API    │─────▶│  PostgreSQL  │
+│   Nginx · :3000  │      │  Java 21  · :8080        │      │  :5432       │
 └──────────────────┘      └──────────────────────────┘      └──────────────┘
 ```
 
