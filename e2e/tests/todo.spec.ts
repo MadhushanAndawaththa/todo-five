@@ -65,14 +65,10 @@ test.describe('Todo App E2E', () => {
   })
 
   test('shows empty state when no tasks exist', async ({ page }) => {
-    // Check empty state is visible (assumes fresh DB or all tasks completed)
-    const taskList = page.getByTestId('task-list')
-    const emptyState = page.getByTestId('empty-state')
-
-    const hasEmptyState = await emptyState.isVisible()
-    const hasTaskList = await taskList.isVisible()
-
-    // One of these must be true — app renders consistently
-    expect(hasEmptyState || hasTaskList).toBe(true)
+    // Wait for loading to finish — either the task list or empty state must appear.
+    // Using .or() so Playwright retries until one is visible (avoids snapshot during skeleton).
+    await expect(
+      page.getByTestId('task-list').or(page.getByTestId('empty-state'))
+    ).toBeVisible()
   })
 })
