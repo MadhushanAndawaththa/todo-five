@@ -31,12 +31,12 @@
 
 ## Quick Start
 
-> **Prerequisites:** [Docker](https://docs.docker.com/get-docker/) and docker-compose
+> **Prerequisites:** [Docker](https://docs.docker.com/get-docker/) (includes Compose)
 
 ```bash
 git clone https://github.com/MadhushanAndawaththa/todo-five.git
 cd todo-five
-docker-compose up --build
+docker compose up --build
 ```
 
 Open **http://localhost:3000** — that's it.
@@ -265,7 +265,7 @@ cd frontend && npm install && npm test
 
 **E2E**
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 cd e2e && npm install
 npx playwright install chromium
 npx playwright test && npx playwright show-report
